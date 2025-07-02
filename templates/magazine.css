@@ -1,0 +1,91 @@
+/* ----------- Config. de página ----------- */
+@page cover { size: A4; margin:0; }
+@page back  { size: A4; margin:0; }
+
+@page {
+  size:A4;
+  margin:20mm 17mm 25mm 17mm;
+
+  /* remove rodapé antigo */
+  @bottom-center { content:""; }
+
+  /* número da página */
+  @top-left-corner {
+    content: counter(page);
+    background:#d62839;
+    color:#fff;
+    font-family:"Bebas";
+    font-size:14pt;
+    padding:2mm 4mm 2mm 2mm;
+    margin-left:5mm;
+    margin-top:1mm;
+    border-right:2mm solid #ffffff; /* espaço visual */
+  }
+
+  /* tipo do artigo */
+  @top-left {
+    content: string(artType);
+    background:#d62839;
+    color:#fff;
+    font-family:"Bebas";
+    font-size:14pt;
+    padding:2mm 4mm;
+    margin-top:1mm;
+  }
+}
+
+/* ----------- Fontes ----------- */
+@font-face { font-family:"Bebas";   src:url("fonts/BebasNeue-Regular.ttf") format("truetype"); }
+@font-face { font-family:"ZenDots"; src:url("fonts/ZenDots-Regular.ttf")   format("truetype"); }
+
+/* corpo texto (Lora) */
+@font-face { font-family:"Lora"; src:url("fonts/Lora-Regular.ttf") format("truetype"); }
+@font-face { font-family:"Lora"; src:url("fonts/Lora-Italic.ttf") format("truetype"); font-style:italic; }
+@font-face { font-family:"Lora"; src:url("fonts/Lora-Bold.ttf") format("truetype"); font-weight:700; }
+@font-face { font-family:"Lora"; src:url("fonts/Lora-BoldItalic.ttf") format("truetype"); font-weight:700; font-style:italic; }
+
+body.pdf { font-family:"Lora",Helvetica,Arial,sans-serif; line-height:1.4; color:#0d0d0d; font-size:12pt; }
+
+/* ----------- Faixa vermelha (título / subtítulo) ----------- */
+header.mag-title {
+  position:absolute; top:0; left:0; right:0;
+  background:#d62839;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height: 128px;   /* garante altura suficiente para as duas linhas */
+  padding: 12px;     /* pequeno padding extra */
+}
+header.mag-title .mag-name {
+  font-family:"ZenDots";
+  font-size:56pt;
+  line-height:1;
+  white-space:nowrap;
+  text-shadow:2px 2px 4px rgba(0,0,0,.6);
+}
+header.mag-title .mag-ed-info {
+  font-family:"Lora";
+  font-size:16pt;
+  margin-top:4px;
+  color:#fff;
+  text-shadow:1px 1px 3px rgba(0,0,0,.7);
+}
+
+/* ----------- Capa (imagem) ----------- */
+.cover .full { width:100%; height:100%; object-fit:cover; }
+
+.mag-highlights { color:#fff; font-size:18pt; }
+
+/* ----------- Índice ----------- */
+nav.toc h1 { font-family:"Bebas"; letter-spacing:1px; margin:0 0 10mm 0; }
+nav.toc ol { list-style:none; padding:0; columns:2 10cm; column-gap:2cm; }
+nav.toc li { break-inside:avoid; margin:0 0 3mm 0; }
+nav.toc a  { text-decoration:none; color:inherit; }
+
+/* ----------- Artigos ----------- */
+article       { break-after:page; }
+article h1    { color:var(--acc,#000); font-size:1.8em; margin:0 0 4mm 0; text-align:left; }
+article .meta { font-size:.8em; text-transform:uppercase; letter-spacing:.5pt; margin:0 0 4mm 0; color:#555; }
+
+.art { column-gap:1.2em; }
+.art.poesia { text-align:center; }
+
+.meta img { width:28px; height:28px; border-radius:50%; filter:grayscale(1); object-fit:cover; }

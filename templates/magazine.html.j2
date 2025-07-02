@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <title>Revista Ateísta — {{ edition.titulo or ('Edição ' ~ edition.numero) }}</title>
+
+  <link rel="stylesheet" href="magazine.css" />
+
+  <!-- Fallback mínimo -->
+  <style>
+    body { margin:0; font-family:Helvetica,Arial,sans-serif; line-height:1.4; color:#222; }
+    .full { width:100%; height:100%; object-fit:cover; display:block; }
+    h1   { margin:0 0 .5em 0; text-align:left; }
+    .meta { font-size:.8em; text-transform:uppercase; color:#555;
+            margin:0 0 1em 0; display:flex; align-items:center; gap:.5em; }
+    .meta img { width:28px; height:28px; border-radius:50%; filter:grayscale(1); object-fit:cover; }
+    nav.toc { page-break-after:always; }
+  </style>
+</head>
+<body class="pdf">
+
+  <!-- CAPA -->
+  <section class="cover"
+           style="page: cover; position:relative; width:100%; height:100%; overflow:hidden;">
+    <img src="{{ cover_image }}" alt="Capa" class="full" />
+
+    <!-- faixa vermelha -->
+    <header class="mag-title">
+      <div class="mag-name">Revista Ateísta</div>
+      <div class="mag-ed-info">{{ subtitle_pt }}</div>
+    </header>
+
+    <!-- logo -->
+    {% if logo_path %}
+    <img src="{{ logo_path }}" alt="logo"
+         style="position:absolute; top:984px; right:16px; width:126px; height:auto;" />
+    {% endif %}
+
+    <!-- highlights -->
+    {% if highlights %}
+    <div class="mag-highlights">
+      {% for h in highlights %}
+        <div>{{ h.title }} — pág.&nbsp;<span>{{ h.page }}</span></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- ÍNDICE -->
+  <nav class="toc" id="indice">
+    <h1 style="text-align:center;">Índice</h1>
+    <ol style="list-style:none; padding:0; columns:2 10cm; column-gap:2cm;">
+      {% for art in articles %}
+        <li style="break-inside:avoid; margin:0 0 4mm 0;">
+          <a href="#{{ art.slug }}" style="text-decoration:none; color:inherit;">{{ art.titulo }}</a>
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <!-- ARTIGOS -->
+  {% for art in articles %}
+  <article id="{{ art.slug }}"
+           class="art {{ art.tipo|lower|replace(' ', '-') }}"
+           data-type="{{ art.tipo }}"
+           style="--acc: {{ style_map[art.tipo].acc }};
+                  column-count: {{ style_map[art.tipo].cols }};
+                  text-align: {{ style_map[art.tipo].get('align','justify') }};
+                  column-gap:1.2em;
+                  string-set: artType attr(data-type);">
+    <h1 style="color:var(--acc);">{{ art.titulo }}</h1>
+
+    <p class="meta">
+      {% if art.autor_foto %}
+      <img src="https:{{ art.autor_foto }}" alt="{{ art.autor_nome }}">
+      {% endif %}
+      {{ art.autor_nome }}
+    </p>
+
+    {{ art.conteudo_html | safe }}
+  </article>
+  {% endfor %}
+
+  <!-- CONTRACAPA -->
+  <section class="back" style="page: back;">
+    <img src="{{ back_cover_image }}" alt="Contracapa" class="full" />
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Arquivos de dados e exportações
+*.csv
+*.xlsx
+*.fst
+
+# PDFs gerados
+*.pdf
+
+# Cache e pastas temporárias
+__pycache__/
+*.py[cod]
+*.log
+*.tmp
+*.bak
+*.DS_Store
+
+# Ambientes virtuais
+.venv/
+.env/
+
+# Jupyter outputs (caso use notebooks)
+.ipynb_checkpoints/
+
+# Diretórios do sistema
+Thumbs.db
+.DS_Store
+
+# Arquivos de build (opcional)
+build/
+dist/
+*.egg-info/
