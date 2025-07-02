@@ -49,10 +49,10 @@ body.pdf { font-family:"Lora",Helvetica,Arial,sans-serif; line-height:1.4; color
 /* ----------- Faixa vermelha (título / subtítulo) ----------- */
 header.mag-title {
   position:absolute; top:0; left:0; right:0;
-  background:#d62839;
+  background:#d6283996;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height: 128px;   /* garante altura suficiente para as duas linhas */
-  padding: 12px;     /* pequeno padding extra */
+  min-height: 144px;
+  padding: 16px;
 }
 header.mag-title .mag-name {
   font-family:"ZenDots";
@@ -60,13 +60,19 @@ header.mag-title .mag-name {
   line-height:1;
   white-space:nowrap;
   text-shadow:2px 2px 4px rgba(0,0,0,.6);
+  align-self:flex-start;
+  text-align:left;
+  margin-left: 16px;
 }
 header.mag-title .mag-ed-info {
   font-family:"Lora";
   font-size:16pt;
   margin-top:4px;
+  margin-left: 20px;
   color:#fff;
-  text-shadow:1px 1px 3px rgba(0,0,0,.7);
+  text-shadow:4px 4px 4px rgba(0,0,0,.7);
+  align-self:flex-start;
+  text-align:left;
 }
 
 /* ----------- Capa (imagem) ----------- */

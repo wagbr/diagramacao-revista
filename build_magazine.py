@@ -12,7 +12,7 @@ from typing import Any, Dict, List
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from slugify import slugify
 from weasyprint import HTML, CSS
 import bbcode, bleach
@@ -47,22 +47,67 @@ def latest_csv(folder:Path,prefix:str)->Path:
     return sorted(folder.glob(f"{prefix}_*.csv"))[-1]
 
 # ---------- Cover & Back ----------------------------------------------------
-def compose_cover(img_path:Path,title:str,subtitle:str)->Path:
-    img=Image.open(img_path).convert("RGBA")
-    draw=ImageDraw.Draw(img)
+def draw_blur_shadow(base: Image.Image, pos: tuple[int, int], text: str,
+                     font: ImageFont.FreeTypeFont,
+                     *, fill="white", shadow="black",
+                     blur_radius: int = 6, offset: tuple[int, int] = (4,4)) -> None:
+    """
+    Desenha `text` em `base`, com sombra desfocada (GaussianBlur).
+
+    blur_radius – quanto maior, mais “spread” a sombra.
+    offset      – deslocamento da sombra em relação ao texto.
+    """
+    x, y = pos
+    ox, oy = offset
+
+    # 1) cria camada RGBA transparente
+    shadow_layer = Image.new("RGBA", base.size, (0,0,0,0))
+    shadow_draw  = ImageDraw.Draw(shadow_layer)
+
+    # 2) escreve o texto em preto na posição deslocada
+    shadow_draw.text((x + ox, y + oy), text, font=font, fill=shadow)
+
+    # 3) aplica blur na camada
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(blur_radius))
+
+    # 4) compõe sobre a imagem base
+    base.alpha_composite(shadow_layer)
+
+    # 5) escreve o texto principal
+    draw = ImageDraw.Draw(base)
+    draw.text((x, y), text, font=font, fill=fill)
+
+# ---- função principal da capa ----------------------------------------
+def compose_cover(base_img: Path, title: str, subtitle: str | None = None) -> Path:
+    base = Image.open(base_img).convert("RGBA")
+
+    draw = ImageDraw.Draw(base)
     try:
-        f_title=ImageFont.truetype("arial.ttf", int(img.width*0.07))
-        f_sub  =ImageFont.truetype("arial.ttf", int(img.width*0.04))
+        font_title = ImageFont.truetype("Lora-Bold.ttf", 444)   # <-- 44 pt FIXO
+        font_sub   = ImageFont.truetype("Lora-Bold.ttf", 280)   # subtítulo menor
     except OSError:
-        f_title=f_sub=ImageFont.load_default()
-    tw,_ = draw.textbbox((0,0),title,font=f_title)[2:]
-    tx=(img.width-tw)//2
-    ty=int(img.height*0.65)
-    draw.text((tx,ty),title,fill="white",font=f_title)
-    sw,_ = draw.textbbox((0,0),subtitle,font=f_sub)[2:]
-    draw.text(((img.width-sw)//2,ty+80),subtitle,fill="white",font=f_sub)
-    out=img_path.parent/"cover_generated.png"
-    img.save(out)
+        font_title = font_sub = ImageFont.load_default()
+
+    # ----- título ------------------------------------------------------
+    tw, th = draw.textbbox((0, 0), title, font=font_title)[2:]
+    tx = (base.width - tw) // 2
+    ty = int(base.height * 0.65)
+    draw_blur_shadow(base, (tx, ty), title, font_title,
+                     fill="white", shadow="black",
+                     blur_radius=6, offset=(3,3))
+
+    # ----- subtítulo ---------------------------------------------------
+    if subtitle:
+        sw, sh = draw.textbbox((0, 0), subtitle, font=font_sub)[2:]
+        sx = (base.width - sw) // 2
+        sy = ty + th + 12
+        draw_blur_shadow(base, (sx, sy), subtitle, font_sub,
+                         fill="white", shadow="black",
+                         blur_radius=4, offset=(2,2))
+
+    # salva
+    out = base_img.parent / "cover_generated.png"
+    base.save(out)
     return out
 
 def blank_back(color="#d62839")->Path:
@@ -159,8 +204,8 @@ def main():
 
     cover = compose_cover(
     args.cover_image,
-    edition.get("titulo", f"Edição nº {latest_num}"),
-    ""                     # ← subtítulo vazio
+    title=edition.get("titulo", f"Edição nº {latest_num}"),
+    subtitle=""
     )   
     back=blank_back()
     css=args.template_dir/"magazine.css"
