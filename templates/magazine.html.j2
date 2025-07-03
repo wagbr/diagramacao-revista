@@ -33,7 +33,7 @@
     <!-- logo -->
     {% if logo_path %}
     <img src="{{ logo_path }}" alt="logo"
-         style="position:absolute; top:984px; right:16px; width:126px; height:auto;" />
+         style="position:absolute; top:116px; right:16px; width:126px; height:auto;" />
     {% endif %}
 
     <!-- highlights -->
@@ -64,20 +64,21 @@
            class="art {{ art.tipo|lower|replace(' ', '-') }}"
            data-type="{{ art.tipo }}"
            style="--acc: {{ style_map[art.tipo].acc }};
-                  column-count: {{ style_map[art.tipo].cols }};
-                  text-align: {{ style_map[art.tipo].get('align','justify') }};
-                  column-gap:1.2em;
                   string-set: artType attr(data-type);">
-    <h1 style="color:var(--acc);">{{ art.titulo }}</h1>
-
-    <p class="meta">
-      {% if art.autor_foto %}
-      <img src="https:{{ art.autor_foto }}" alt="{{ art.autor_nome }}">
-      {% endif %}
-      {{ art.autor_nome }}
-    </p>
-
-    {{ art.conteudo_html | safe }}
+    <div class="art-header">
+      <h1>{{ art.titulo }}</h1>
+      <p class="meta">
+        {% if art.autor_foto %}
+        <img src="https:{{ art.autor_foto }}" alt="{{ art.autor_nome }}">
+        {% endif %}
+        {{ art.autor_nome }}{% if art.autor_bio %} — {{ art.autor_bio }}{% endif %}
+      </p>
+    </div>
+    <div class="art-body"
+         style="column-count: {{ style_map[art.tipo].cols }};
+                text-align: {{ style_map[art.tipo].get('align','justify') }};">
+      {{ art.conteudo_html | safe }}
+    </div>
   </article>
   {% endfor %}
 

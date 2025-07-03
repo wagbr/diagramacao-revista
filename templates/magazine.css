@@ -89,11 +89,35 @@ nav.toc li { break-inside:avoid; margin:0 0 3mm 0; }
 nav.toc a  { text-decoration:none; color:inherit; }
 
 /* ----------- Artigos ----------- */
-article       { break-after:page; }
-article h1    { color:var(--acc,#000); font-size:1.8em; margin:0 0 4mm 0; text-align:left; }
-article .meta { font-size:.8em; text-transform:uppercase; letter-spacing:.5pt; margin:0 0 4mm 0; color:#555; }
+article { break-after:page; }
+.art-header { margin-bottom:4mm; }
+.art-header h1 {
+  color:var(--acc,#000);
+  font-size:1.8em;
+  margin:0 0 2mm 0;
+  text-align:left;
+}
+.art-header .meta {
+  font-size:.8em;
+  text-transform:uppercase;
+  letter-spacing:.5pt;
+  margin:0;
+  color:#555;
+  display:flex;
+  align-items:center;
+  gap:.5em;
+}
+.art-body { column-gap:1.2em; }
+article.poesia .art-body { text-align:center; }
 
-.art { column-gap:1.2em; }
-.art.poesia { text-align:center; }
+.meta img {
+  all: unset;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  filter: grayscale(1);
+  object-fit: cover;
+  display: inline-block;
+  box-shadow: 0 0 0 2px #f2c230;
+}
 
-.meta img { width:28px; height:28px; border-radius:50%; filter:grayscale(1); object-fit:cover; }
