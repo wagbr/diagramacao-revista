@@ -19,6 +19,7 @@
     padding:2mm 4mm 2mm 2mm;
     margin-left:5mm;
     margin-top:1mm;
+    margin-bottom: 8mm;
     border-right:2mm solid #ffffff; /* espaço visual */
   }
 
@@ -31,6 +32,7 @@
     font-size:14pt;
     padding:2mm 4mm;
     margin-top:1mm;
+    margin-bottom: 8mm;
   }
 }
 
@@ -44,7 +46,7 @@
 @font-face { font-family:"Lora"; src:url("fonts/Lora-Bold.ttf") format("truetype"); font-weight:700; }
 @font-face { font-family:"Lora"; src:url("fonts/Lora-BoldItalic.ttf") format("truetype"); font-weight:700; font-style:italic; }
 
-body.pdf { font-family:"Lora",Helvetica,Arial,sans-serif; line-height:1.4; color:#0d0d0d; font-size:12pt; }
+body.pdf { font-family:"Lora",Helvetica,Arial,sans-serif; line-height:1.4; color:#0d0d0d; font-size:8pt; }
 
 /* ----------- Faixa vermelha (título / subtítulo) ----------- */
 header.mag-title {

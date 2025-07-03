@@ -153,7 +153,7 @@ STYLE:Dict[str,Dict[str,Any]]={
     "Humor":{"acc":"#0d0d0d","cols":2},
     "Eventos":{"acc":"#0d0d0d","cols":2},
     "Filosofia":{"acc":"#0d0d0d","cols":2},
-    "Contra-apologética":{"acc":"#0d0d0d","cols":2},
+    "Contra-apologética":{"acc":"#0d0d0d","cols":4},
 }
 
 # ---------- Build PDF -------------------------------------------------------
