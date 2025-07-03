@@ -93,13 +93,12 @@ article { break-after:page; }
 .art-header { margin-bottom:4mm; }
 .art-header h1 {
   color:var(--acc,#000);
-  font-size:1.8em;
+  font-size:2.5em;
   margin:0 0 2mm 0;
   text-align:left;
 }
 .art-header .meta {
   font-size:.8em;
-  text-transform:uppercase;
   letter-spacing:.5pt;
   margin:0;
   color:#555;
@@ -112,12 +111,28 @@ article.poesia .art-body { text-align:center; }
 
 .meta img {
   all: unset;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   filter: grayscale(1);
   object-fit: cover;
   display: inline-block;
-  box-shadow: 0 0 0 2px #f2c230;
+}
+
+.meta .author-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta .author-name {
+  font-weight: bold;
+  font-size: 1.75em;
+  color: #0d0d0d;
+  text-transform:uppercase;
+}
+
+.meta .author-bio {
+  font-style: italic;
+  font-size: 1.25em;
 }
 
