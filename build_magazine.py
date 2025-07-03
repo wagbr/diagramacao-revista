@@ -17,6 +17,7 @@ from slugify import slugify
 from weasyprint import HTML, CSS
 import bbcode, bleach
 from bleach.css_sanitizer import CSSSanitizer
+import textwrap
 
 # ---------- BBCode → HTML ---------------------------------------------------
 BB = bbcode.Parser()
@@ -47,6 +48,28 @@ def latest_csv(folder:Path,prefix:str)->Path:
     return sorted(folder.glob(f"{prefix}_*.csv"))[-1]
 
 # ---------- Cover & Back ----------------------------------------------------
+def wrap_text(draw: ImageDraw.ImageDraw, text: str,
+              font: ImageFont.FreeTypeFont, max_width: int) -> list[str]:
+    """
+    Quebra o texto em múltiplas linhas para não ultrapassar max_width.
+    Retorna lista de linhas.
+    """
+    words = text.split()
+    lines: list[str] = []
+    current = []
+
+    for w in words:
+        test_line = " ".join(current + [w])
+        w_box = draw.textbbox((0, 0), test_line, font=font)[2]
+        if w_box <= max_width:
+            current.append(w)
+        else:
+            lines.append(" ".join(current))
+            current = [w]
+    if current:
+        lines.append(" ".join(current))
+    return lines
+
 def draw_blur_shadow(base: Image.Image, pos: tuple[int, int], text: str,
                      font: ImageFont.FreeTypeFont,
                      *, fill="white", shadow="black",
@@ -80,35 +103,39 @@ def draw_blur_shadow(base: Image.Image, pos: tuple[int, int], text: str,
 # ---- função principal da capa ----------------------------------------
 def compose_cover(base_img: Path, title: str, subtitle: str | None = None) -> Path:
     base = Image.open(base_img).convert("RGBA")
-
     draw = ImageDraw.Draw(base)
-    try:
-        font_title = ImageFont.truetype("Lora-Bold.ttf", 444)   # <-- 44 pt FIXO
-        font_sub   = ImageFont.truetype("Lora-Bold.ttf", 280)   # subtítulo menor
-    except OSError:
-        font_title = font_sub = ImageFont.load_default()
 
-    # ----- título ------------------------------------------------------
-    tw, th = draw.textbbox((0, 0), title, font=font_title)[2:]
-    tx = (base.width - tw) // 2
-    ty = int(base.height * 0.65)
-    draw_blur_shadow(base, (tx, ty), title, font_title,
-                     fill="white", shadow="black",
-                     blur_radius=6, offset=(3,3))
+    font_title = ImageFont.truetype("fonts/Lora-Bold.ttf", 196)
+    font_sub   = ImageFont.truetype("fonts/Lora-Bold.ttf", 196)
 
-    # ----- subtítulo ---------------------------------------------------
+    # ----- título em linhas -------------
+    max_width = int(base.width * 0.8)  # 80 % da capa
+    lines = wrap_text(draw, title, font_title, max_width)
+
+    # Altura total do bloco
+    line_height = font_title.getbbox("Ay")[3]  # altura da linha
+    block_h = len(lines) * line_height + (len(lines)-1) * 10  # 10 px entre linhas
+    start_y = int(base.height * 0.65) - block_h // 2
+
+    for i, line in enumerate(lines):
+        w_line = draw.textbbox((0, 0), line, font=font_title)[2]
+        x_line = (base.width - w_line) // 2
+        y_line = start_y + i * (line_height + 10)
+        draw_blur_shadow(base, (x_line, y_line), line, font_title,
+                         fill="white", shadow="black", blur_radius=8, offset=(4,4))
+
+    # ----- subtítulo opcional -----------
     if subtitle:
         sw, sh = draw.textbbox((0, 0), subtitle, font=font_sub)[2:]
         sx = (base.width - sw) // 2
-        sy = ty + th + 12
+        sy = start_y + block_h + 20
         draw_blur_shadow(base, (sx, sy), subtitle, font_sub,
-                         fill="white", shadow="black",
-                         blur_radius=4, offset=(2,2))
+                         fill="white", shadow="black", blur_radius=4, offset=(2,2))
 
-    # salva
     out = base_img.parent / "cover_generated.png"
     base.save(out)
     return out
+
 
 def blank_back(color="#d62839")->Path:
     back=Image.new("RGB",(2480,3508),color)
