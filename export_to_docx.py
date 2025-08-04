@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-export_to_docx.py – Gera arquivo DOCX com os artigos aprovados da Revista Ateísta.
+export_to_docx.py – Gera arquivo DOCX com os artigos aprovados da Revista Ateísta,
+incluindo nome, foto e bio do autor.
 
 Uso:
     python export_to_docx.py --data-dir dados/ --out-file revista.docx
@@ -11,11 +12,14 @@ from __future__ import annotations
 
 import argparse
 import ast
+import io
 from pathlib import Path
 from typing import Any
+from urllib.request import urlopen
 
 import pandas as pd
 from docx import Document
+from docx.shared import Inches
 import bbcode
 import bleach
 
@@ -46,14 +50,31 @@ def latest_csv(folder: Path, prefix: str) -> Path:
     """Retorna o CSV mais recente com determinado prefixo."""
     return sorted(folder.glob(f"{prefix}_*.csv"))[-1]
 
+
+def fetch_image(url: str) -> bytes | None:
+    """Baixa imagem de URL e retorna bytes."""
+    if not url:
+        return None
+    try:
+        with urlopen(url) as resp:
+            return resp.read()
+    except Exception:
+        return None
+
 def build_docx(articles: list[dict], edition: dict, out_file: Path) -> None:
     """Monta o documento DOCX com título da edição e artigos."""
     doc = Document()
     doc.add_heading(edition.get("titulo") or f"Edição nº {edition.get('numero', '')}", 0)
     for art in articles:
         doc.add_heading(art.get("titulo", "Sem título"), level=1)
+        if art.get("autor_foto"):
+            img_bytes = fetch_image(art["autor_foto"])
+            if img_bytes:
+                doc.add_picture(io.BytesIO(img_bytes), width=Inches(1.5))
         if art.get("autor_nome"):
             doc.add_paragraph(art["autor_nome"])
+        if art.get("autor_bio"):
+            doc.add_paragraph(art["autor_bio"])
         doc.add_paragraph(bb2text(art.get("conteudo")))
     doc.save(out_file)
 
